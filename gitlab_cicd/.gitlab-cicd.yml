@@ -1,0 +1,86 @@
+image: docker:24
+
+services:
+  - docker:24-dind
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_HOST: tcp://docker:2375
+  IMAGE_NAME: node-app
+  CONTAINER_NAME: node-app
+
+stages:
+  - test
+  - build_and_push
+  - deploy
+
+# -------------------
+# TEST STAGE
+# -------------------
+test:
+  image: node:18
+  stage: test
+  cache:
+    paths:
+      - node_modules/
+  script:
+    - echo "Installing dependencies..."
+    - npm install
+    - echo "Running tests..."
+    - npm test
+
+
+# -------------------------------------------
+# BUILD APPLICATION IMAGE AND PUSH TO AWS ECR
+# -------------------------------------------
+build_push_ecr:
+  stage: build_and_push
+  image:
+    name: amazon/aws-cli
+    entrypoint: [""]  
+  services:
+    - docker:dind
+  before_script:
+    - yum install -y docker
+    - docker version
+    - aws --version
+  script:
+
+    # Login to ECR
+    - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+    # Build Docker image
+    - docker build -t $ECR_REPO:$CI_COMMIT_SHA .
+
+    # # Tag Docker image
+    - docker tag $ECR_REPO:$CI_COMMIT_SHA $ECR_REGISTRY/$ECR_REPO:$CI_COMMIT_SHA
+    - docker tag $ECR_REPO:$CI_COMMIT_SHA $ECR_REGISTRY/$ECR_REPO:latest
+
+    # # Push images to ECR
+    - docker push $ECR_REGISTRY/$ECR_REPO:$CI_COMMIT_SHA
+    - docker push $ECR_REGISTRY/$ECR_REPO:latest
+
+  only:
+    - master
+
+# -------------------
+# DEPLOY TO EC2
+# -------------------
+deploy:
+  stage: deploy
+  image: ubuntu:latest
+  before_script:
+    - apt-get update && apt-get install -y openssh-client
+    - mkdir -p ~/.ssh
+    - echo "$SSH_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+  script:
+    - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST "
+        aws ecr get-login-password --region $AWS_DEFAULT_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY &&
+        sudo docker pull $ECR_REGISTRY/$ECR_REPO:latest &&
+        sudo docker stop $CONTAINER_NAME || true &&
+        sudo docker rm $CONTAINER_NAME || true &&
+        sudo docker run -d --name $CONTAINER_NAME -p 80:5000 $ECR_REGISTRY/$ECR_REPO:latest"
+
+  only:
+    - master
