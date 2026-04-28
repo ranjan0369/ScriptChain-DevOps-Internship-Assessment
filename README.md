@@ -24,6 +24,13 @@ The solution is provided in [aws_cloudformation/s3_ec2_template.yml](aws_cloudfo
 - Public subnet and internet gateway for external access
 - Outputs for VPC, subnet, EC2 public IP, and S3 bucket name
 
+
+**Result:**
+<p align="center">
+	<img src="output_ss/aws_cloudformation.png" alt="AWS CloudFormation Output" width="600"/>
+</p>
+
+
 Refer to the YAML file for full resource definitions and customization options.
 
 ---
@@ -41,6 +48,12 @@ The pipeline configuration is in [gitlab_cicd/.gitlab-cicd.yml](gitlab_cicd/.git
 - Uses Docker-in-Docker for image building
 - AWS CLI for ECR authentication and deployment
 - SSH-based deployment to EC2
+
+
+**Result:**
+<p align="center">
+	<img src="output_ss/gitlab_cicd.png" alt="GitLab CI/CD Output" width="600"/>
+</p>
 
 See the YAML file for environment variable requirements and step details.
 
@@ -60,6 +73,12 @@ The [lambda_function](lambda_function/) directory contains:
 1. Install dependencies into a `package/` directory
 2. Copy application code
 3. Zip the contents for AWS Lambda deployment
+
+
+**Result:**
+<p align="center">
+	<img src="output_ss/aws_lambda.png" alt="AWS Lambda Output" width="600"/>
+</p>
 
 This approach ensures all dependencies are included for Lambda execution. See the scripts and code for details.
 

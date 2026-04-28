@@ -5,4 +5,4 @@ aws lambda create-function \
     --runtime python3.10 \
     --handler app.lambda_handler \
     --zip-file fileb://lambda.zip \
-    --role arn:aws:iam::992382837099:role/lambdaExecRole
+    --role <iam_role_arn>
