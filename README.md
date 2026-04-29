@@ -1,7 +1,7 @@
 
-# ScriptChain DevOps Internship Assessment
+# ScriptChain Health DevOps Internship Assessment
 
-This repository contains solutions for the ScriptChain DevOps Internship Assessment. The tasks demonstrate practical DevOps skills using AWS CloudFormation, GitLab CI/CD, and AWS Lambda packaging with Python. Each section below describes the approach and provides references to the relevant files in this repository.
+This repository contains solutions for the ScriptChain Health DevOps Internship Assessment. The tasks demonstrate practical DevOps skills using AWS CloudFormation, GitLab CI/CD, and AWS Lambda packaging with Python. Each section below describes the approach and provides references to the relevant files in this repository.
 
 ## Table of Contents
 - [AWS CloudFormation: S3 & EC2 Example](#aws-cloudformation-s3--ec2-example)
